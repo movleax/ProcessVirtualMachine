@@ -6,9 +6,9 @@ using namespace std;
 * HALT = 0
 * LOAD = 1
 * ADD = 2
-*
-*
-*
+* SUB = 3
+* MULT = 4
+* DIV = 5
 *
 *
 */
@@ -48,9 +48,9 @@ private:
 };
 
 bool running = true;
-Instruction instructions[] = { { (char)0x01, (short)0x8000, 0x00001000 },{ (char)0x01, (short)0x4000, 0x00000100 } };
+Instruction instructions[] = { { (char)0x01, (short)0x8000, 0x00001000 },{ (char)0x01, (short)0x4000, 0x00000100 },{ (char)0x02, (short)0x8420, 0x00000000 },{ (char)0x00, (short)0x0000, 0x00000000 } };
 unsigned currInst = -1;
-unsigned numberOfInstructions = 2;
+unsigned numberOfInstructions = 4;
 
 char opCode = 0;
 int reg1 = 0;
@@ -127,6 +127,85 @@ void load()
 	*selectedRegister = instructions[currInst].value;
 }
 
+void add()
+{
+	// what is the first selected register
+	int *selectedRegisterA = SelectRegister(regSlot[0]);
+	int *selectedRegisterB = SelectRegister(regSlot[1]);
+	int *selectedRegisterC = SelectRegister(regSlot[2]);
+
+	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
+	{
+		cout << "Cannot load value into null register\n";
+		return;
+	}
+
+	*selectedRegisterC = *selectedRegisterA + *selectedRegisterB;
+}
+
+void sub()
+{
+	// what is the first selected register
+	int *selectedRegisterA = SelectRegister(regSlot[0]);
+	int *selectedRegisterB = SelectRegister(regSlot[1]);
+	int *selectedRegisterC = SelectRegister(regSlot[2]);
+
+	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
+	{
+		cout << "Cannot load value into null register\n";
+		return;
+	}
+
+	*selectedRegisterC = *selectedRegisterA - *selectedRegisterB;
+}
+
+void mult()
+{
+	// what is the first selected register
+	int *selectedRegisterA = SelectRegister(regSlot[0]);
+	int *selectedRegisterB = SelectRegister(regSlot[1]);
+	int *selectedRegisterC = SelectRegister(regSlot[2]);
+
+	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
+	{
+		cout << "Cannot load value into null register\n";
+		return;
+	}
+
+	*selectedRegisterC = *selectedRegisterA * *selectedRegisterB;
+}
+
+void div()
+{
+	// what is the first selected register
+	int *selectedRegisterA = SelectRegister(regSlot[0]);
+	int *selectedRegisterB = SelectRegister(regSlot[1]);
+	int *selectedRegisterC = SelectRegister(regSlot[2]);
+
+	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
+	{
+		cout << "Cannot load value into null register\n";
+		return;
+	}
+
+	if (*selectedRegisterB == 0)
+	{
+		cout << "Cannot divide by zero\n";
+		return;
+	}
+
+	*selectedRegisterC = *selectedRegisterA / *selectedRegisterB;
+}
+
+void printRegisters()
+{
+	cout << "reg1 = " << std::hex << reg1 << "\n";
+	cout << "reg2 = " << std::hex << reg2 << "\n";
+	cout << "reg3 = " << std::hex << reg3 << "\n";
+	cout << "reg4 = " << std::hex << reg4 << "\n";
+	cout << "\n";
+}
+
 void execute()
 {
 
@@ -134,14 +213,11 @@ void execute()
 	{
 	case 0x00: running = false; break;
 	case 0x01: load(); break;
+	case 0x02: add(); break;
+	case 0x03: sub(); break;
+	case 0x04: mult(); break;
+	case 0x05: div(); break;
 	}
-}
-
-
-
-void run()
-{
-
 }
 
 int main()
@@ -152,6 +228,10 @@ int main()
 		fetch();
 		decode();
 		execute();
+		printRegisters();
 	}
+
+	cin.get();
+
 	return 0;
 }
