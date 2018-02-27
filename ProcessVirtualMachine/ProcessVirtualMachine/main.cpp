@@ -152,7 +152,6 @@ int main()
 		fetch();
 		decode();
 		execute();
-
 	}
 	return 0;
 }
