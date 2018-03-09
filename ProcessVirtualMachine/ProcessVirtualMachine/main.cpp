@@ -1,5 +1,5 @@
 #include <iostream>
-
+#include <vector>
 using namespace std;
 
 /**
@@ -9,9 +9,22 @@ using namespace std;
 * SUB = 3
 * MULT = 4
 * DIV = 5
+* CMP = 6 TODO 
+* JMP = 7 TODO
+*
+*/
+
+/**
+* JE / JZ	Jump Equal or Jump Zero	ZF
+* JNE / JNZ	Jump not Equal or Jump Not Zero	ZF
+* JG / JNLE	Jump Greater or Jump Not Less / Equal	OF, SF, ZF
+* JGE / JNL	Jump Greater / Equal or Jump Not Less	OF, SF
+* JL / JNGE	Jump Less or Jump Not Greater / Equal	OF, SF
+* JLE / JNG	Jump Less / Equal or Jump Not Greater	OF, SF, ZF
 *
 *
 */
+
 
 /**
 *
@@ -47,10 +60,18 @@ private:
 	}
 };
 
+
+
+
 bool running = true;
-Instruction instructions[] = { { (char)0x01, (short)0x8000, 0x00001000 },{ (char)0x01, (short)0x4000, 0x00000100 },{ (char)0x02, (short)0x8420, 0x00000000 },{ (char)0x00, (short)0x0000, 0x00000000 } };
+Instruction instructions[] = { { (char)0x01, (short)0x8000, 0x00001000 }, { (char)0x01, (short)0x4000, 0x00000100 }, { (char)0x02, (short)0x8480, 0x00000000 },{ (char)0x07, (short)0x0000, 0x00000001 }, { (char)0x00, (short)0x0000, 0x00000000 } };
 unsigned currInst = -1;
-unsigned numberOfInstructions = 4;
+unsigned numberOfInstructions = 5;
+
+
+std::vector<Instruction> memory;
+
+
 
 char opCode = 0;
 int reg1 = 0;
@@ -66,6 +87,7 @@ void fetch()
 	if (currInst == numberOfInstructions)
 	{
 		cout << "End of instructions\n";
+		running = false;
 		return;
 	}
 
@@ -77,6 +99,7 @@ void decode()
 	if (currInst < 0)
 	{
 		cout << "Incorrect instruction index\n";
+		running = false;
 		return;
 	}
 
@@ -107,7 +130,7 @@ int *SelectRegister(const int &r)
 	case 4: ret = &reg2; break;
 	case 2: ret = &reg3; break;
 	case 1: ret = &reg4; break;
-	default: cout << "Invalid register number\n";
+	default: cout << "Invalid register number\n"; running = false;
 	}
 
 	return ret;
@@ -121,6 +144,7 @@ void load()
 	if (selectedRegister == 0)
 	{
 		cout << "Cannot load value into null register\n";
+		running = false;
 		return;
 	}
 
@@ -137,6 +161,7 @@ void add()
 	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
 	{
 		cout << "Cannot load value into null register\n";
+		running = false;
 		return;
 	}
 
@@ -153,6 +178,7 @@ void sub()
 	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
 	{
 		cout << "Cannot load value into null register\n";
+		running = false;
 		return;
 	}
 
@@ -169,6 +195,7 @@ void mult()
 	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
 	{
 		cout << "Cannot load value into null register\n";
+		running = false;
 		return;
 	}
 
@@ -185,12 +212,14 @@ void div()
 	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
 	{
 		cout << "Cannot load value into null register\n";
+		running = false;
 		return;
 	}
 
 	if (*selectedRegisterB == 0)
 	{
 		cout << "Cannot divide by zero\n";
+		running = false;
 		return;
 	}
 
@@ -206,6 +235,19 @@ void printRegisters()
 	cout << "\n";
 }
 
+void jmp()
+{
+	// TODO check for out of bounds of program's alloted memory and its memory that should not be accessible
+	if (imm < 0)
+	{
+		cout << "Cannot jump out of bounds of alotted program memory\n";
+		running = false;
+		return;
+	}
+
+	currInst = imm;
+}
+
 void execute()
 {
 
@@ -217,11 +259,19 @@ void execute()
 	case 0x03: sub(); break;
 	case 0x04: mult(); break;
 	case 0x05: div(); break;
+	case 0x06: cout << "CMP needs to be implemented\n"; break;
+	case 0x07: jmp(); break;
 	}
 }
 
 int main()
 {
+	for (int i = 0; i < numberOfInstructions; i++)
+	{
+		memory.push_back(instructions[i]);
+	}
+
+	int nop = 0;
 
 	while (running)
 	{
