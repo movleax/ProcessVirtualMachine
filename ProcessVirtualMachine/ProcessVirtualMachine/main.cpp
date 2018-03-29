@@ -14,17 +14,6 @@ using namespace std;
 *
 */
 
-/**
-* JE / JZ	Jump Equal or Jump Zero	ZF
-* JNE / JNZ	Jump not Equal or Jump Not Zero	ZF
-* JG / JNLE	Jump Greater or Jump Not Less / Equal	OF, SF, ZF
-* JGE / JNL	Jump Greater / Equal or Jump Not Less	OF, SF
-* JL / JNGE	Jump Less or Jump Not Greater / Equal	OF, SF
-* JLE / JNG	Jump Less / Equal or Jump Not Greater	OF, SF, ZF
-*
-*
-*/
-
 
 /**
 *
@@ -70,7 +59,7 @@ unsigned numberOfInstructions = 5;
 
 
 std::vector<Instruction> memory;
-
+std::vector<int> variables;
 
 
 char opCode = 0;
@@ -110,13 +99,13 @@ void decode()
 	regSlot[2] = (instructions[currInst].registers & 0x00F0) >> 4;
 	regSlot[3] = (instructions[currInst].registers & 0x000F);
 
-	for (int i = 0; i < 4; i++)
+	/*for (int i = 0; i < 4; i++)
 	{
 		if (reg1 == 0) reg1 = (regSlot[i] & 8) >> 3;
 		if (reg2 == 0) reg2 = (regSlot[i] & 4) >> 2;
 		if (reg3 == 0) reg3 = (regSlot[i] & 2) >> 1;
 		if (reg4 == 0) reg4 = (regSlot[i] & 1);
-	}
+	}*/
 	imm = instructions[currInst].value;
 }
 
@@ -248,6 +237,64 @@ void jmp()
 	currInst = imm;
 }
 
+void cmp()
+{
+	// what is the first selected register
+	int *selectedRegisterA = SelectRegister(regSlot[0]);
+	int *selectedRegisterB = SelectRegister(regSlot[1]);
+	int *selectedRegisterC = SelectRegister(regSlot[2]);
+
+	if (selectedRegisterA == 0 || selectedRegisterB == 0 || selectedRegisterC == 0)
+	{
+		cout << "Cannot load value into null register\n";
+		running = false;
+		return;
+	}
+
+	// JE / JZ		Jump Equal or Jump Zero							ZF
+	if (*selectedRegisterA == *selectedRegisterB)
+	{
+		// ZF == True
+
+	}
+	// JNE / JNZ		Jump not Equal or Jump Not Zero					ZF
+	else
+	{
+		// ZF == False
+	}
+	
+	// JG / JNLE		Jump Greater or Jump Not Less / Equal		OF, SF, ZF
+	if (*selectedRegisterA > *selectedRegisterB)
+	{ 
+		// OF == False?
+		// SF == False?
+		// ZF == False -- handled in JE / JNE if statement
+	}
+	// JGE / JNL		Jump Greater / Equal or Jump Not Less		OF, SF
+	else
+	{
+		// OF == True
+		// SF == True
+	}
+
+	// JL / JNGE		Jump Less or Jump Not Greater / Equal		OF, SF
+	if (*selectedRegisterA < *selectedRegisterB)
+	{
+		// OF == True ?
+		// SF == True ?
+	}
+
+	// JLE / JNG		Jump Less / Equal or Jump Not Greater		OF, SF, ZF
+	else
+	{
+		// OF == True
+		// SF == True
+		// ZF == True -- handled in JE / JNE if statement
+	}
+
+	//*selectedRegisterC = *selectedRegisterA + *selectedRegisterB;
+}
+
 void execute()
 {
 
@@ -259,7 +306,7 @@ void execute()
 	case 0x03: sub(); break;
 	case 0x04: mult(); break;
 	case 0x05: div(); break;
-	case 0x06: cout << "CMP needs to be implemented\n"; break;
+	case 0x06: cmp(); cout << "CMP needs to be implemented\n"; break;
 	case 0x07: jmp(); break;
 	}
 }
