@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include "main.h"
 using namespace std;
 
 /**
@@ -9,10 +10,17 @@ using namespace std;
 * SUB = 3
 * MULT = 4
 * DIV = 5
-* CMP = 6 TODO 
-* JMP = 7 TODO
+* CMP = 6
+* JMP = 7
+* JE / JZ	= 8			Jump Equal or Jump Zero							ZF
+* JNE / JNZ = 9			Jump not Equal or Jump Not Zero					ZF
+* JG / JNLE = 10		Jump Greater or Jump Not Less / Equal		OF, SF, ZF
+* JGE / JNL = 11		Jump Greater / Equal or Jump Not Less		OF, SF
+* JL / JNGE = 12		Jump Less or Jump Not Greater / Equal		OF, SF
+* JLE / JNG = 13		Jump Less / Equal or Jump Not Greater		OF, SF, ZF
 *
 */
+
 
 
 /**
@@ -242,6 +250,7 @@ void jmp()
 	currInst = imm;
 }
 
+// http://unixwiz.net/techtips/x86-jumps.html
 void cmp()
 {
 	// what is the first selected register
@@ -259,51 +268,90 @@ void cmp()
 	// JE / JZ		Jump Equal or Jump Zero							ZF
 	if (*selectedRegisterA == *selectedRegisterB)
 	{
-		// ZF == True
+		ZF == true;
 		cout << "*selectedRegisterA == *selectedRegisterB\n";
 	}
 	// JNE / JNZ		Jump not Equal or Jump Not Zero					ZF
 	else
 	{
-		// ZF == False
+		ZF == false;
 		cout << "*selectedRegisterA != *selectedRegisterB\n";
 	}
 	
 	// JG / JNLE		Jump Greater or Jump Not Less / Equal		OF, SF, ZF
 	if (*selectedRegisterA > *selectedRegisterB)
 	{ 
-		// OF == False?
-		// SF == False?
+		OF == false;
+		SF == false;
 		// ZF == False -- handled in JE / JNE if statement
 		cout << "*selectedRegisterA > *selectedRegisterB\n";
 	}
 	// JGE / JNL		Jump Greater / Equal or Jump Not Less		OF, SF
 	else
 	{
-		// OF == True
-		// SF == True
+		OF == true;
+		SF == true;
 		cout << "*selectedRegisterA <= *selectedRegisterB\n";
 	}
 
 	// JL / JNGE		Jump Less or Jump Not Greater / Equal		OF, SF
 	if (*selectedRegisterA < *selectedRegisterB)
 	{
-		// OF == True ?
-		// SF == True ?
+		OF == true;
+		SF == true;
 		cout << "*selectedRegisterA < *selectedRegisterB\n";
 	}
 
 	// JLE / JNG		Jump Less / Equal or Jump Not Greater		OF, SF, ZF
 	else
 	{
-		// OF == False
-		// SF == False
+		OF == false;
+		SF == false;
 		// ZF == True -- handled in JE / JNE if statement
 		cout << "*selectedRegisterA >= *selectedRegisterB\n";
 	}
 
 	//*selectedRegisterC = *selectedRegisterA + *selectedRegisterB;
 }
+
+void JE_JZ()
+{
+	if (ZF == false)
+		return;
+	
+
+}
+
+void JNE_JNZ()
+{
+	if (ZF == true)
+		return;
+}
+
+void JG_JNLE()
+{
+	if (!(OF == SF && ZF == false))
+		return;
+}
+
+void JGE_JNL()
+{
+	if (!(OF == SF))
+		return;
+}
+
+void JL_JNGE()
+{
+	if (!(OF != SF))
+		return;
+}
+
+void JLE_JNG()
+{
+	if (!(OF != SF && ZF == true))
+		return;
+}
+
 
 void execute()
 {
@@ -318,6 +366,12 @@ void execute()
 	case 0x05: div(); break;
 	case 0x06: cmp(); break;
 	case 0x07: jmp(); break;
+	case 0x08: JE_JZ(); break;
+	case 0x09: JNE_JNZ(); break;
+	case 0x0A: JG_JNLE(); break;
+	case 0x0B: JGE_JNL(); break;
+	case 0x0C: JL_JNGE(); break;
+	case 0x0D: JLE_JNG(); break;
 	}
 }
 
