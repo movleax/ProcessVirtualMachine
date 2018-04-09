@@ -53,7 +53,7 @@ private:
 
 
 bool running = true;
-Instruction instructions[] = { { (char)0x01, (short)0x8000, 0x00001000 }, { (char)0x01, (short)0x4000, 0x00000100 }, { (char)0x02, (short)0x8480, 0x00000000 },{ (char)0x07, (short)0x0000, 0x00000001 }, { (char)0x00, (short)0x0000, 0x00000000 } };
+Instruction instructions[] = { { (char)0x01, (short)0x8000, 0x00001000 }, { (char)0x01, (short)0x4000, 0x00000100 }, { (char)0x02, (short)0x8480, 0x00000000 },{ (char)0x06, (short)0x8480, 0x00000001 }, { (char)0x00, (short)0x0000, 0x00000000 } };
 unsigned currInst = -1;
 unsigned numberOfInstructions = 5;
 
@@ -69,6 +69,11 @@ int reg3 = 0;
 int reg4 = 0;
 int regSlot[4] = { 0 };
 int imm = 0;
+
+bool OF = false;
+bool CF = false;
+bool ZF = false;
+bool SF = false;
 
 
 void fetch()
@@ -255,12 +260,13 @@ void cmp()
 	if (*selectedRegisterA == *selectedRegisterB)
 	{
 		// ZF == True
-
+		cout << "*selectedRegisterA == *selectedRegisterB\n";
 	}
 	// JNE / JNZ		Jump not Equal or Jump Not Zero					ZF
 	else
 	{
 		// ZF == False
+		cout << "*selectedRegisterA != *selectedRegisterB\n";
 	}
 	
 	// JG / JNLE		Jump Greater or Jump Not Less / Equal		OF, SF, ZF
@@ -269,12 +275,14 @@ void cmp()
 		// OF == False?
 		// SF == False?
 		// ZF == False -- handled in JE / JNE if statement
+		cout << "*selectedRegisterA > *selectedRegisterB\n";
 	}
 	// JGE / JNL		Jump Greater / Equal or Jump Not Less		OF, SF
 	else
 	{
 		// OF == True
 		// SF == True
+		cout << "*selectedRegisterA <= *selectedRegisterB\n";
 	}
 
 	// JL / JNGE		Jump Less or Jump Not Greater / Equal		OF, SF
@@ -282,14 +290,16 @@ void cmp()
 	{
 		// OF == True ?
 		// SF == True ?
+		cout << "*selectedRegisterA < *selectedRegisterB\n";
 	}
 
 	// JLE / JNG		Jump Less / Equal or Jump Not Greater		OF, SF, ZF
 	else
 	{
-		// OF == True
-		// SF == True
+		// OF == False
+		// SF == False
 		// ZF == True -- handled in JE / JNE if statement
+		cout << "*selectedRegisterA >= *selectedRegisterB\n";
 	}
 
 	//*selectedRegisterC = *selectedRegisterA + *selectedRegisterB;
@@ -306,7 +316,7 @@ void execute()
 	case 0x03: sub(); break;
 	case 0x04: mult(); break;
 	case 0x05: div(); break;
-	case 0x06: cmp(); cout << "CMP needs to be implemented\n"; break;
+	case 0x06: cmp(); break;
 	case 0x07: jmp(); break;
 	}
 }
