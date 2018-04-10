@@ -236,19 +236,6 @@ void printRegisters()
 	cout << "\n";
 }
 
-void jmp()
-{
-	// TODO check for out of bounds of program's alloted memory and its memory that should not be accessible
-	if (imm < 0)
-	{
-		cout << "Cannot jump out of bounds of alotted program memory\n";
-		running = false;
-		return;
-	}
-
-	currInst = imm;
-}
-
 // http://unixwiz.net/techtips/x86-jumps.html
 void cmp()
 {
@@ -313,42 +300,65 @@ void cmp()
 	//*selectedRegisterC = *selectedRegisterA + *selectedRegisterB;
 }
 
+void jmp()
+{
+	// TODO check for out of bounds of program's alloted memory and its memory that should not be accessible
+	if (imm < 0)
+	{
+		cout << "Cannot jump out of bounds of alotted program memory\n";
+		running = false;
+		return;
+	}
+
+	currInst = imm;
+}
+
 void JE_JZ()
 {
 	if (ZF == false)
 		return;
 	
-
+	currInst = imm;
 }
 
 void JNE_JNZ()
 {
 	if (ZF == true)
 		return;
+
+	currInst = imm;
 }
 
 void JG_JNLE()
 {
 	if (!(OF == SF && ZF == false))
 		return;
+
+	currInst = imm;
 }
 
 void JGE_JNL()
 {
 	if (!(OF == SF))
 		return;
+
+	currInst = imm;
 }
 
 void JL_JNGE()
 {
 	if (!(OF != SF))
 		return;
+
+	currInst = imm;
 }
 
 void JLE_JNG()
 {
 	if (!(OF != SF && ZF == true))
 		return;
+
+	currInst = imm;
 }
 
 
