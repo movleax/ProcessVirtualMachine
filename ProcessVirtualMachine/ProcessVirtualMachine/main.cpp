@@ -1,6 +1,5 @@
 #include <iostream>
 #include <vector>
-#include "main.h"
 using namespace std;
 
 /**
@@ -268,45 +267,45 @@ void cmp()
 	// JE / JZ		Jump Equal or Jump Zero							ZF
 	if (*selectedRegisterA == *selectedRegisterB)
 	{
-		ZF == true;
+		ZF = true;
 		cout << "*selectedRegisterA == *selectedRegisterB\n";
 	}
 	// JNE / JNZ		Jump not Equal or Jump Not Zero					ZF
 	else
 	{
-		ZF == false;
+		ZF = false;
 		cout << "*selectedRegisterA != *selectedRegisterB\n";
 	}
 	
 	// JG / JNLE		Jump Greater or Jump Not Less / Equal		OF, SF, ZF
 	if (*selectedRegisterA > *selectedRegisterB)
 	{ 
-		OF == false;
-		SF == false;
+		OF = false;
+		SF = false;
 		// ZF == False -- handled in JE / JNE if statement
 		cout << "*selectedRegisterA > *selectedRegisterB\n";
 	}
 	// JGE / JNL		Jump Greater / Equal or Jump Not Less		OF, SF
 	else
 	{
-		OF == true;
-		SF == true;
+		OF = true;
+		SF = true;
 		cout << "*selectedRegisterA <= *selectedRegisterB\n";
 	}
 
 	// JL / JNGE		Jump Less or Jump Not Greater / Equal		OF, SF
 	if (*selectedRegisterA < *selectedRegisterB)
 	{
-		OF == true;
-		SF == true;
+		OF = true;
+		SF = true;
 		cout << "*selectedRegisterA < *selectedRegisterB\n";
 	}
 
 	// JLE / JNG		Jump Less / Equal or Jump Not Greater		OF, SF, ZF
 	else
 	{
-		OF == false;
-		SF == false;
+		OF = false;
+		SF = false;
 		// ZF == True -- handled in JE / JNE if statement
 		cout << "*selectedRegisterA >= *selectedRegisterB\n";
 	}
